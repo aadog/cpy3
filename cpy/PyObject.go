@@ -2,6 +2,11 @@ package cpy
 
 import "github.com/aadog/cpy3/cpy/dllimports"
 
+func PyObject_New(tp uintptr) uintptr {
+	return defSyscallN(dllimports.PyObject_New, tp)
+}
+
+// Return value: New reference
 func PyObject_GetAttrString(obj uintptr, attr_name string) uintptr {
 	r := defSyscallN(dllimports.PyObject_GetAttrString, obj, PascalStr(attr_name))
 	return r
@@ -20,13 +25,9 @@ func PyObject_DelAttrString(obj uintptr, attr_name string) int {
 	return int(r)
 }
 
+// Return value: New reference.
 func PyObject_Type(obj uintptr) uintptr {
 	r := defSyscallN(dllimports.PyObject_Type, obj)
-	return r
-}
-
-func PyObject_Str(obj uintptr) uintptr {
-	r := defSyscallN(dllimports.PyObject_Str, obj)
 	return r
 }
 
@@ -46,4 +47,25 @@ func PyObject_CallObject(obj uintptr, args uintptr) uintptr {
 func PyObject_CallNoArgs(obj uintptr) uintptr {
 	r := defSyscallN(dllimports.PyObject_CallNoArgs, obj)
 	return r
+}
+
+func PyObject_Hash(obj uintptr) int {
+	r := defSyscallN(dllimports.PyObject_Hash, obj)
+	return int(r)
+}
+
+func PyObject_Str(obj uintptr) string {
+	r := defSyscallN(dllimports.PyObject_Str, obj)
+	defer Py_DecRef(r)
+	return PyUnicode_AsUTF8(r)
+}
+
+// Return value: New reference.
+func PyObject_Dir(obj uintptr) uintptr {
+	r := defSyscallN(dllimports.PyObject_Dir, obj)
+	return r
+}
+
+func PyObject_Del(obj uintptr) {
+	defSyscallN(dllimports.PyObject_Del, obj)
 }

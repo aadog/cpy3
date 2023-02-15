@@ -88,8 +88,8 @@ PyUnicode_InternInPlace
 PyUnicode_InternFromString
 PyObject_Init
 PyObject_InitVar
-PyObject_New
-PyObject_NewVar
+_PyObject_New
+_PyObject_NewVar
 PyObject_Del
 PyObject_Length
 PyObject_Str
@@ -248,6 +248,7 @@ PyBytes_ConcatAndDel
 _PyBytes_Resize
 PyType_Type
 _PyType_Name
+PyType_GetName
 PyType_GetModule
 PyType_Check
 PyType_CheckExact

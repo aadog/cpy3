@@ -15,3 +15,9 @@ func PyType_IsSubtype(a uintptr, b uintptr) bool {
 	r := defSyscallN(dllimports.PyType_IsSubtype, a, b)
 	return GoBool(r)
 }
+
+func PyType_GetName(tp uintptr) string {
+	r := defSyscallN(dllimports.PyType_GetName, tp)
+	defer Py_DecRef(r)
+	return GoStr(r)
+}

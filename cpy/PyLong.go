@@ -1,6 +1,8 @@
 package cpy
 
-import "github.com/aadog/cpy3/cpy/dllimports"
+import (
+	"github.com/aadog/cpy3/cpy/dllimports"
+)
 
 func PyLong_Type() uintptr {
 	return uintptr(dllimports.GetImportDefFunc(uiLib, dllimports.PyLong_Type))
@@ -18,18 +20,31 @@ func PyLong_AsLongLong(obj uintptr) int64 {
 	r := defSyscallN(dllimports.PyLong_AsLongLong, obj)
 	return int64(r)
 }
+func PyLong_AsUnsignedLong(obj uintptr) uint {
+	r := defSyscallN(dllimports.PyLong_AsUnsignedLong, obj)
+	return uint(r)
+}
+func PyLong_AsUnsignedLongLong(obj uintptr) uint64 {
+	r := defSyscallN(dllimports.PyLong_AsUnsignedLongLong, obj)
+	return uint64(r)
+}
 
+// Return value: New reference.
 func PyLong_FromLong(n int) uintptr {
 	r := defSyscallN(dllimports.PyLong_FromLong, uintptr(n))
 	return r
 }
 
+// Return value: New reference.
 func PyLong_FromLongLong(n int64) uintptr {
 	r := defSyscallN(dllimports.PyLong_FromLongLong, uintptr(n))
 	return r
 }
+
+// Return value: New reference.
 func PyLong_FromDouble(n float64) uintptr {
-	r := defSyscallN(dllimports.PyLong_FromDouble, uintptr(n))
+	//浮点传不过去
+	r := defSyscallN(dllimports.PyLong_FromLongLong, uintptr(n))
 	return r
 }
 

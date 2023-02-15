@@ -15,15 +15,17 @@ func PyTuple_Check(obj uintptr) int64 {
 	return int64(r)
 }
 
+// Return value: Borrowed reference.
 func PyTuple_GetItem(obj uintptr, pos int64) uintptr {
 	r := defSyscallN(dllimports.PyTuple_GetItem, obj, uintptr(pos))
 	return r
 }
-func PyTuple_SetItem(obj uintptr, pos int64, o uintptr) uintptr {
+func PyTuple_SetItem(obj uintptr, pos int64, o uintptr) int {
 	r := defSyscallN(dllimports.PyTuple_SetItem, obj, uintptr(pos), o)
-	return r
+	return int(r)
 }
 
+// Return value: New reference.
 func PyTuple_GetSlice(obj uintptr, low int64, high int64) uintptr {
 	r := defSyscallN(dllimports.PyTuple_GetSlice, obj, uintptr(low), uintptr(high))
 	return r
