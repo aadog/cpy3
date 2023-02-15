@@ -1,23 +1,23 @@
-package cpy3
+package main
 
-//package main
-//
-//import (
-//	"fmt"
-//	_ "github.com/aadog/cpy3/alib"
-//	"github.com/aadog/cpy3/cpy/api"
-//)
-//
-//func main() {
-//
-//	api.Py_Initialize()
-//	u := api.PyUnicode_FromString("ff")
-//	fmt.Println(api.PyUnicode_AsUTF8(u))
-//	//api.Py_SetProgramName("xxxx")
-//	//api.Py_SetPath("aaa")
-//	//api.Py_SetPythonHome("bb")
-//	fmt.Println(api.Py_GetProgramName())
-//	fmt.Println(api.Py_GetPath())
-//	fmt.Println(api.Py_GetPythonHome())
-//	api.Py_Finalize()
-//}
+import (
+	"fmt"
+	_ "github.com/aadog/cpy3/alib"
+	"github.com/aadog/cpy3/cpy"
+)
+
+func main() {
+
+	cpy.Py_Initialize()
+	cpy.Py_SetProgramName("xxxx")
+	cpy.Py_SetPath("aaa")
+	cpy.Py_SetPythonHome("bb")
+
+	fmt.Println(cpy.Py_None())
+	//cpy.Py_FatalError("aaa")
+	//fmt.Println(cpy.Py_CompileString("print('xx')", "", 0))
+	//fp := cpy.Py_fopen_obj(cpy.Py_BuildValue("s", "test.py"), "r+")
+	//cpy.PyRun_SimpleFile(fp, "text.py")
+
+	cpy.Py_Finalize()
+}
