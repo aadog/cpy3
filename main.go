@@ -7,17 +7,26 @@ import (
 	"runtime"
 )
 
+/*
+extern void* GoPyModule();
+ */
+import "C"
+import "unsafe"
+
+//export GoPyModule
+func GoPyModule()uintptr{
+	GoModule := gpy.CreateGoModule("_ui", "bb")
+	GoModule.AddFunction("T", func() []byte {
+		return make([]byte, 10240)
+	})
+	return GoModule.Instance()
+}
+
 func main1() {
 
 	gpy.SetProgramName(os.Args[0])
 	gpy.SetPythonHome("./")
-	gpy.PyImport_AppendInittab("_ui", func() *gpy.PyGoModule {
-		GoModule := gpy.CreateGoModule("_ui", "bb")
-		GoModule.AddFunction("T", func() []byte {
-			return make([]byte, 10240)
-		})
-		return GoModule
-	})
+	gpy.PyImport_AppendInittab("_ui",uintptr(unsafe.Pointer(&C.GoPyModule)))
 	gpy.Initialize()
 
 	gpy.RunSimpleString(

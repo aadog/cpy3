@@ -47,3 +47,6 @@ func SetProgramName(name string) {
 func SetPythonHome(home string) {
 	cpy.Py_SetPythonHome(home)
 }
+func SetPath(name string) {
+	cpy.Py_SetPath(name)
+}
