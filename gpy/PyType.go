@@ -10,6 +10,23 @@ type PyType struct {
 	instance unsafe.Pointer
 }
 
+func (p *PyType) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyType) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+func (p *PyType) Name() string {
+	return p.ClassName()
+}
+
+func (p *PyType) Str() string {
+	return p.ToString()
+}
+
 func (p *PyType) DecRef() {
 	cpy.Py_DecRef(p._instance())
 }
@@ -55,12 +72,13 @@ func (p *PyType) ToString() string {
 func NewPyTypeWithPtr(ptr uintptr) *PyType {
 	o := new(PyType)
 	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyType).Free)
+	//setFinalizer(o, (*PyType).Free)
 	return o
 }
 
+// Return value: New reference
 func PyObjectType(owner IPyObject) *PyType {
-	return NewPyTypeWithPtr(CheckPtr(owner))
+	return NewPyTypeWithPtr(cpy.PyObject_Type(CheckPtr(owner)))
 }
 
 func AsType(obj interface{}) *PyType {

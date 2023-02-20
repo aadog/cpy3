@@ -1,27 +1,40 @@
 package main
 
 import (
-	"fmt"
 	_ "github.com/aadog/cpy3/alib"
-	"github.com/aadog/cpy3/cpy"
 	"github.com/aadog/cpy3/gpy"
+	"os"
 	"runtime"
 )
 
-func main() {
+func main1() {
 
-	cpy.Py_Initialize()
-	cpy.Py_SetProgramName("xxxx")
-	cpy.Py_SetPath("aaa")
-	cpy.Py_SetPythonHome("bb")
+	gpy.SetProgramName(os.Args[0])
+	gpy.SetPythonHome("./")
+	gpy.PyImport_AppendInittab("_ui", func() *gpy.PyGoModule {
+		GoModule := gpy.CreateGoModule("_ui", "bb")
+		GoModule.AddFunction("T", func() []byte {
+			return make([]byte, 10240)
+		})
+		return GoModule
+	})
+	gpy.Initialize()
 
-	fmt.Println(gpy.PyLong_FromDouble(100.011).AsInt64())
+	gpy.RunSimpleString(
+		`
+import _ui
+import time
+
+for i in range(0,1000000):
+	_ui.Call('T')
+	time.sleep(0.01)
+	`)
 	runtime.GC()
-	//time.Sleep(time.Second * 1000)
-	//cpy.Py_FatalError("aaa")
-	//fmt.Println(cpy.Py_CompileString("print('xx')", "", 0))
-	//fp := cpy.Py_fopen_obj(cpy.Py_BuildValue("s", "test.py"), "r+")
-	//cpy.PyRun_SimpleFile(fp, "text.py")
+	gpy.Finalize()
+}
 
-	cpy.Py_Finalize()
+func main() {
+	main1()
+	//
+	//main1()
 }

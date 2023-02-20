@@ -10,6 +10,23 @@ type PyDict struct {
 	instance unsafe.Pointer
 }
 
+func (p *PyClass) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyClass) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+func (p *PyDict) Type() *PyType {
+	return PyObjectType(p)
+}
+
+func (p *PyDict) Str() string {
+	return p.ToString()
+}
+
 func (p *PyDict) DecRef() {
 	cpy.Py_DecRef(p._instance())
 }
@@ -30,7 +47,9 @@ func (p *PyDict) UnsafeAddr() unsafe.Pointer {
 }
 
 func (p *PyDict) ClassName() string {
-	return PyObjectType(p).ClassName()
+	tp := PyObjectType(p)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
 func (p *PyDict) Free() {
@@ -77,11 +96,11 @@ func (p *PyDict) GetItem(key *PyObject) *PyObject {
 	return AsPyObject(cpy.PyDict_GetItem(p._instance(), key._instance()))
 }
 
-func (p *PyDict) SetItemString(key string, val *PyObject) int {
-	return cpy.PyDict_SetItemString(p._instance(), key, val._instance())
+func (p *PyDict) SetItemString(key string, val IPyObject) int {
+	return cpy.PyDict_SetItemString(p._instance(), key, val.Instance())
 }
-func (p *PyDict) SetItem(key *PyObject, val *PyObject) int {
-	return cpy.PyDict_SetItem(p._instance(), key._instance(), val._instance())
+func (p *PyDict) SetItem(key IPyObject, val IPyObject) int {
+	return cpy.PyDict_SetItem(p._instance(), key.Instance(), val.Instance())
 }
 
 func (p *PyDict) Size() int64 {
@@ -95,7 +114,7 @@ func (p *PyDict) Clear() {
 func NewPyDictWithPtr(ptr uintptr) *PyDict {
 	o := new(PyDict)
 	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyDict).Free)
+	//setFinalizer(o, (*PyDict).Free)
 	return o
 }
 

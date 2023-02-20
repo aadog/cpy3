@@ -15,5 +15,5 @@ func PyExc_ValueError() uintptr {
 }
 
 func PyErr_SetString(tp uintptr, message string) {
-	defSyscallN(dllimports.PyErr_SetString, PascalStr(message))
+	defSyscallN(dllimports.PyErr_SetString, tp, PascalStr(message))
 }

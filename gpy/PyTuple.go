@@ -10,6 +10,23 @@ type PyTuple struct {
 	instance unsafe.Pointer
 }
 
+func (p *PyTuple) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyTuple) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+func (o *PyTuple) Type() *PyType {
+	return PyObjectType(o)
+}
+
+func (p *PyTuple) Str() string {
+	return p.ToString()
+}
+
 func (p *PyTuple) DecRef() {
 	cpy.Py_DecRef(p._instance())
 }
@@ -30,7 +47,9 @@ func (p *PyTuple) UnsafeAddr() unsafe.Pointer {
 }
 
 func (p *PyTuple) ClassName() string {
-	return PyObjectType(p).ClassName()
+	tp := PyObjectType(p)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
 func (p *PyTuple) Free() {
@@ -78,7 +97,7 @@ func (p *PyTuple) GetSlice(low int64, high int64) *PyList {
 func NewPyTupleWithPtr(ptr uintptr) *PyTuple {
 	o := new(PyTuple)
 	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyTuple).Free)
+	//setFinalizer(o, (*PyTuple).Free)
 	return o
 }
 

@@ -13,7 +13,8 @@ func PyErr_NewException(name string, base *PyObject, dict *PyObject) *PyObject {
 }
 
 func PyExc_Exception() *PyObject {
-	return AsPyObject(cpy.PyExc_Exception())
+	e := AsPyObject(cpy.PyExc_Exception())
+	return e
 }
 func PyExc_ValueError() *PyObject {
 	return AsPyObject(cpy.PyExc_ValueError())
@@ -21,4 +22,8 @@ func PyExc_ValueError() *PyObject {
 
 func PyErr_SetString(tp *PyObject, message string) {
 	cpy.PyErr_SetString(tp._instance(), message)
+}
+
+func FatalError(message string) {
+	cpy.Py_FatalError(message)
 }

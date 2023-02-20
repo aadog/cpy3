@@ -10,6 +10,23 @@ type PyList struct {
 	instance unsafe.Pointer
 }
 
+func (p *PyList) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyList) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+func (p *PyList) Type() *PyType {
+	return PyObjectType(p)
+}
+
+func (p *PyList) Str() string {
+	return p.ToString()
+}
+
 func (p *PyList) DecRef() {
 	cpy.Py_DecRef(p._instance())
 }
@@ -30,7 +47,9 @@ func (p *PyList) UnsafeAddr() unsafe.Pointer {
 }
 
 func (p *PyList) ClassName() string {
-	return PyObjectType(p).ClassName()
+	tp := PyObjectType(p)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
 func (p *PyList) Free() {
@@ -73,15 +92,15 @@ func (p *PyList) Size() int64 {
 func (p *PyList) Insert(index int64, item *PyObject) int {
 	return cpy.PyList_Insert(p._instance(), index, item._instance())
 }
-func (p *PyList) Append(item *PyObject) int {
-	return cpy.PyList_Append(p._instance(), item._instance())
+func (p *PyList) Append(item IPyObject) int {
+	return cpy.PyList_Append(p._instance(), item.Instance())
 }
 
 // auto free
 func NewPyListWithPtr(ptr uintptr) *PyList {
 	o := new(PyList)
 	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyList).Free)
+	//setFinalizer(o, (*PyList).Free)
 	return o
 }
 

@@ -10,6 +10,23 @@ type PyUnicode struct {
 	instance unsafe.Pointer
 }
 
+func (p *PyUnicode) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyUnicode) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+func (o *PyUnicode) Type() *PyType {
+	return PyObjectType(o)
+}
+
+func (p *PyUnicode) Str() string {
+	return p.ToString()
+}
+
 func (p *PyUnicode) DecRef() {
 	cpy.Py_DecRef(p._instance())
 }
@@ -30,7 +47,9 @@ func (p *PyUnicode) UnsafeAddr() unsafe.Pointer {
 }
 
 func (p *PyUnicode) ClassName() string {
-	return PyObjectType(p).ClassName()
+	tp := PyObjectType(p)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
 func (p *PyUnicode) Free() {
@@ -74,7 +93,7 @@ func PyUnicode_DecodeFSDefault(s string) *PyUnicode {
 func NewPyUnicodeWithPtr(ptr uintptr) *PyUnicode {
 	o := new(PyUnicode)
 	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyUnicode).Free)
+	//setFinalizer(o, (*PyUnicode).Free)
 	return o
 }
 

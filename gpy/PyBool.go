@@ -10,6 +10,22 @@ type PyBool struct {
 	instance unsafe.Pointer
 }
 
+func (p *PyBool) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyBool) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+func (p *PyBool) Type() *PyType {
+	return PyObjectType(p)
+}
+func (p *PyBool) Str() string {
+	return p.ToString()
+}
+
 func (p *PyBool) DecRef() {
 	cpy.Py_DecRef(p._instance())
 }
@@ -29,7 +45,9 @@ func (p *PyBool) UnsafeAddr() unsafe.Pointer {
 }
 
 func (p *PyBool) ClassName() string {
-	return PyObjectType(p).ClassName()
+	tp := PyObjectType(p)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
 func (p *PyBool) Free() {
@@ -61,7 +79,7 @@ func (p *PyBool) ToString() string {
 func NewPyBoolWithPtr(ptr uintptr) *PyBool {
 	o := new(PyBool)
 	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyBool).Free)
+	//setFinalizer(o, (*PyBool).Free)
 	return o
 }
 

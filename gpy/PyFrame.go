@@ -10,6 +10,23 @@ type PyFrame struct {
 	instance unsafe.Pointer
 }
 
+func (p *PyFrame) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyFrame) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+func (p *PyFrame) Type() *PyType {
+	return PyObjectType(p)
+}
+
+func (p *PyFrame) Str() string {
+	return p.ToString()
+}
+
 func (p *PyFrame) DecRef() {
 	cpy.Py_DecRef(p._instance())
 }
@@ -29,7 +46,9 @@ func (p *PyFrame) UnsafeAddr() unsafe.Pointer {
 }
 
 func (p *PyFrame) ClassName() string {
-	return PyObjectType(p).ClassName()
+	tp := PyObjectType(p)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
 func (p *PyFrame) Free() {
@@ -68,7 +87,7 @@ func (p *PyFrame) GetCode() *PyFrame {
 func NewPyFrameWithPtr(ptr uintptr) *PyFrame {
 	o := new(PyFrame)
 	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyFrame).Free)
+	//setFinalizer(o, (*PyFrame).Free)
 	return o
 }
 

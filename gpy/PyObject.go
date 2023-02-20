@@ -1,7 +1,6 @@
 package gpy
 
 import (
-	"fmt"
 	"github.com/aadog/cpy3/cpy"
 	"unsafe"
 )
@@ -11,8 +10,16 @@ type PyObject struct {
 	instance unsafe.Pointer
 }
 
+func (p *PyObject) Str() string {
+	return p.ToString()
+}
+
 func (p *PyObject) DecRef() {
 	cpy.Py_DecRef(p._instance())
+}
+
+func AsPyNil() *PyObject {
+	return &PyObject{instance: unsafe.Pointer(uintptr(0))}
 }
 
 func AsPyObject(obj interface{}) *PyObject {
@@ -23,51 +30,73 @@ func AsPyObject(obj interface{}) *PyObject {
 	return &PyObject{instance: instance}
 }
 
-func (o *PyObject) Free() {
-	if o.instance != nullptr {
-		fmt.Println("不知道为什么有一个错误")
-		//cpy.Py_DecRef(o._instance())
-		//cpy.PyObject_Del(o.Instance())
-		o.instance = nullptr
+func (p *PyObject) Free() {
+	if p.instance != nullptr {
+		cpy.Py_DecRef(p._instance())
+		p.instance = nullptr
 	}
 }
-func (o *PyObject) _instance() uintptr {
-	return uintptr(o.instance)
+func (p *PyObject) _instance() uintptr {
+	return uintptr(p.instance)
 }
 
-func (o *PyObject) Instance() uintptr {
-	return o._instance()
+func (p *PyObject) Instance() uintptr {
+	return p._instance()
 }
 
-func (o *PyObject) UnsafeAddr() unsafe.Pointer {
-	return o.instance
+func (p *PyObject) UnsafeAddr() unsafe.Pointer {
+	return p.instance
 }
 
-func (o *PyObject) IsValid() bool {
-	return o.instance != nullptr
+func (p *PyObject) IsValid() bool {
+	return p.instance != nullptr
 }
 
-func (o *PyObject) GetHashCode() int64 {
-	return int64(cpy.PyObject_Hash(o._instance()))
+func (p *PyObject) GetHashCode() int64 {
+	return int64(cpy.PyObject_Hash(p._instance()))
 }
 
-func (o *PyObject) ToString() string {
-	return cpy.PyObject_Str(o._instance())
+func (p *PyObject) ToString() string {
+	return cpy.PyObject_Str(p._instance())
 }
 
-func (o *PyObject) ClassName() string {
-	return PyObjectType(o).ClassName()
+func (p *PyObject) ClassName() string {
+	tp := PyObjectType(p)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
-//// Get class type information.
-//func (o *TObject) ClassType() TClass {
-//	return Object_ClassType(o._instance())
-//}
+func (p *PyObject) CallNoArgs() IPyObject {
+	return AsPyObject(cpy.PyObject_CallNoArgs(p.Instance()))
+}
+func (p *PyObject) Call(args IPyObject, kwargs IPyObject) IPyObject {
+	return AsPyObject(cpy.PyObject_Call(p.Instance(), args.Instance(), kwargs.Instance()))
+}
+func (p *PyObject) CallObject(args IPyObject) IPyObject {
+	return AsPyObject(cpy.PyObject_CallObject(p.Instance(), args.Instance()))
+}
+func (p *PyObject) PyObject_Call(args IPyObject, kwargs IPyObject) IPyObject {
+	return AsPyObject(cpy.PyObject_Call(p.Instance(), args.Instance(), kwargs.Instance()))
+}
+
+func (p *PyObject) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyObject) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+// Get class type information.
+func (p *PyObject) Type() *PyType {
+	return PyObjectType(p)
+}
 
 // auto free
 func NewPyObjectWithPtr(ptr uintptr) *PyObject {
-	o := new(PyObject)
-	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyObject).Free)
-	return o
+	p := new(PyObject)
+	p.instance = unsafe.Pointer(ptr)
+	//setFinalizer(o, (*PyObject).Free)
+	return p
 }

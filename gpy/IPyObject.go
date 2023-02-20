@@ -7,6 +7,8 @@ import (
 // IPyObject 共公的对象接口
 type IPyObject interface {
 	DecRef()
+	IncRef()
+	RefCount() int
 	Instance() uintptr
 	IsValid() bool
 	UnsafeAddr() unsafe.Pointer
@@ -16,7 +18,7 @@ type IPyObject interface {
 	GetHashCode() int64
 	Equals(IPyObject) bool
 	//DisposeOf()
-	//ClassType() types.TClass
+	Type() *PyType
 	InstanceSize() int32
 	//InheritsFrom(types.TClass) bool
 
@@ -24,4 +26,5 @@ type IPyObject interface {
 	//As() TAs
 
 	ToString() string
+	Str() string
 }

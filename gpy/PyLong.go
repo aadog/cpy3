@@ -2,12 +2,30 @@ package gpy
 
 import (
 	"github.com/aadog/cpy3/cpy"
+	"strconv"
 	"unsafe"
 )
 
 type PyLong struct {
 	IPyObject
 	instance unsafe.Pointer
+}
+
+func (p *PyLong) IncRef() {
+	if p._instance() != 0 {
+		cpy.Py_IncRef(p._instance())
+	}
+}
+func (p *PyLong) RefCount() int {
+	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
+}
+
+func (p *PyLong) Type() *PyType {
+	return PyObjectType(p)
+}
+
+func (p *PyLong) Str() string {
+	return p.ToString()
 }
 
 func (p *PyLong) DecRef() {
@@ -30,7 +48,9 @@ func (p *PyLong) UnsafeAddr() unsafe.Pointer {
 }
 
 func (p *PyLong) ClassName() string {
-	return PyObjectType(p).ClassName()
+	tp := PyObjectType(p)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
 func (p *PyLong) Free() {
@@ -71,17 +91,25 @@ func (p *PyLong) AsUint64() int64 {
 	return cpy.PyLong_AsLongLong(p._instance())
 }
 func (p *PyLong) AsFloat32() float32 {
-	return float32(cpy.PyLong_AsDouble(p._instance()))
+	//暂时找不到syscall float实现
+	//return cpy.PyLong_AsDouble(p._instance())
+	v := cpy.PyObject_Str(p.Instance())
+	f, _ := strconv.ParseFloat(v, 64)
+	return float32(f)
 }
 func (p *PyLong) AsDouble() float64 {
-	return cpy.PyLong_AsDouble(p._instance())
+	//暂时找不到syscall float实现
+	//return cpy.PyLong_AsDouble(p._instance())
+	v := cpy.PyObject_Str(p.Instance())
+	f, _ := strconv.ParseFloat(v, 64)
+	return f
 }
 
 // auto free
 func NewPyLongWithPtr(ptr uintptr) *PyLong {
 	o := new(PyLong)
 	o.instance = unsafe.Pointer(ptr)
-	setFinalizer(o, (*PyLong).Free)
+	//setFinalizer(o, (*PyLong).Free)
 	return o
 }
 
