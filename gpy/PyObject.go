@@ -24,6 +24,20 @@ func (p *PyObject) GetAttrStringToInt(attr_name string) int {
 	return AsPyLong(a).AsInt()
 }
 
+// Return value: Borrowed reference.
+func (p *PyObject) GetAttrStringToFloat32(attr_name string) float32 {
+	a:=AsPyObject(cpy.PyObject_GetAttrString(p._instance(),attr_name))
+	defer a.Free()
+	return AsPyLong(a).AsFloat32()
+}
+
+// Return value: Borrowed reference.
+func (p *PyObject) GetAttrStringToDouble(attr_name string) float64 {
+	a:=AsPyObject(cpy.PyObject_GetAttrString(p._instance(),attr_name))
+	defer a.Free()
+	return AsPyLong(a).AsDouble()
+}
+
 // Return value: New reference.
 func (p *PyObject) GetAttrString(attr_name string) *PyObject {
 	return AsPyObject(cpy.PyObject_GetAttrString(p._instance(),attr_name))

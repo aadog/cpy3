@@ -86,12 +86,61 @@ func (p *PyDict) DelItem(key *PyObject) int {
 	return cpy.PyDict_DelItem(p._instance(), key._instance())
 }
 
+// Return value: Borrowed reference.
 func (p *PyDict) GetItemString(key string) *PyObject {
 	return AsPyObject(cpy.PyDict_GetItemString(p._instance(), key))
 }
+func (p *PyDict) GetItemStringToStringOr(key string,def string)string{
+	item:=p.GetItemString(key)
+	if item.Str()=="None"{
+		return def
+	}
+	return AsPyUnicode(item).AsUTF8()
+}
+func (p *PyDict) GetItemStringToFloat32Or(key string,def float32)float32{
+	item:=p.GetItemString(key)
+	if item.Str()=="None"{
+		return def
+	}
+	return AsPyFloat(item).AsFloat32()
+}
+func (p *PyDict) GetItemStringToDoubleOr(key string,def float64)float64{
+	item:=p.GetItemString(key)
+	if item.Str()=="None"{
+		return def
+	}
+	return AsPyLong(item).AsDouble()
+}
+
+func (p *PyDict) GetItemStringToIntOr(key string,def int)int{
+	item:=p.GetItemString(key)
+	if item.Str()=="None"{
+		return def
+	}
+	return AsPyLong(item).AsInt()
+}
+func (p *PyDict) GetItemStringToInt64Or(key string,def int64)int64{
+	item:=p.GetItemString(key)
+	if item.Str()=="None"{
+		return def
+	}
+	return AsPyLong(item).AsInt64()
+}
+
 // Return value: New reference.
 func (p *PyDict) Keys() *PyObject {
 	return NewPyObjectWithPtr(cpy.PyDict_Keys(p._instance()))
+}
+
+// Return value: Borrowed reference.
+func (p *PyDict) KeysToStrings() []string {
+	keys:=AsPyList(NewPyObjectWithPtr(cpy.PyDict_Keys(p._instance())))
+	defer keys.Free()
+	results:=make([]string,0)
+	for i := int64(0); i < keys.Size(); i++ {
+		results = append(results, keys.GetItem(i).Str())
+	}
+	return results
 }
 
 // Return value: Borrowed reference.
@@ -128,7 +177,7 @@ func AsPyDict(obj interface{}) *PyDict {
 	}
 	return &PyDict{instance: instance}
 }
-
+// Return value: New reference.
 func NewPyDict() *PyDict {
 	return NewPyDictWithPtr(cpy.PyDict_New())
 }

@@ -17,12 +17,42 @@ func GoToPyObject(o interface{}) IPyObject {
 	valOf := reflect.ValueOf(o)
 
 	if o == nil {
-		return PyReturnNone()
+		return AsPyNil()
 	}
-	//*PyObject return
-	if to.AssignableTo(reflect.TypeOf(&PyObject{})) {
-		return o.(*PyObject)
+
+
+	////*PyObject return
+	//if to.AssignableTo(reflect.TypeOf(&PyObject{})) {
+	//	return o.(*PyObject)
+	//}
+
+	toTypeString:=to.String()
+
+	if convertCheckPyTypeName(toTypeString,"PyObject"){
+		return AsPyObject(o)
 	}
+	if convertCheckPyTypeName(toTypeString,"PyList"){
+		return AsPyList(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyDict"){
+		return AsPyDict(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyUnicode"){
+		return AsPyUnicode(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyLong"){
+		return AsPyLong(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyBool"){
+		return AsPyBool(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyBytes"){
+		return AsPyBytes(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"IPyObject"){
+		return AsPyObject(o)
+	}
+
 	if valOf.CanInt() {
 		return PyLongFromLongLong(valOf.Int())
 	}
@@ -63,7 +93,9 @@ func GoToPyObject(o interface{}) IPyObject {
 		}
 		return d
 	}
-	return PyReturnNone()
+
+	PyErr_SetString(UserException(),"返回不知道怎么处理")
+	return nil
 }
 
 func PyObjectToGo(o IPyObject, to reflect.Type) any {

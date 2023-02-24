@@ -98,7 +98,7 @@ func NewPyUnicodeWithPtr(ptr uintptr) *PyUnicode {
 	//setFinalizer(o, (*PyUnicode).Free)
 	return o
 }
-
+// Return value: New reference.
 func NewPyUnicode(s string) *PyUnicode {
 	return NewPyUnicodeWithPtr(cpy.PyUnicode_FromString(s))
 }

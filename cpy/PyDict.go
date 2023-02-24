@@ -12,10 +12,10 @@ func PyDict_SetItem(obj uintptr, key uintptr, val uintptr) int {
 }
 
 func PyDict_SetItemString(obj uintptr, key string, val uintptr) int {
-	r := defSyscallN(dllimports.PyDict_SetItem, obj, PascalStr(key), val)
+	r := defSyscallN(dllimports.PyDict_SetItemString, obj, PascalStr(key), val)
 	return int(r)
 }
-
+// Return value: New reference.
 func PyDict_New() uintptr {
 	r := defSyscallN(dllimports.PyDict_New)
 	return r
@@ -40,6 +40,7 @@ func PyDict_Keys(obj uintptr) uintptr {
 	r := defSyscallN(dllimports.PyDict_Keys, obj)
 	return r
 }
+// Return value: Borrowed reference.
 func PyDict_GetItemString(obj uintptr, key string) uintptr {
 	r := defSyscallN(dllimports.PyDict_GetItemString, obj, PascalStr(key))
 	return r

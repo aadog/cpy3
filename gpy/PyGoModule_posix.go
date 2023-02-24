@@ -196,6 +196,7 @@ func PyMethodForward(self *PyGoModule, args *PyTuple, method interface{}) IPyObj
 		fnArgs = append(fnArgs, reflect.ValueOf(PyObjectToGo(inArg, fnArgType)))
 	}
 	rets := methodValue.Call(fnArgs)
+
 	if len(rets) == 1 {
 		firstRet := rets[0]
 		r := GoToPyObject(firstRet.Interface())

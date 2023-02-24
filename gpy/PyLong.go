@@ -4,6 +4,7 @@ import (
 	"github.com/aadog/cpy3/cpy"
 	"strconv"
 	"unsafe"
+	"fmt"
 )
 
 type PyLong struct {
@@ -121,8 +122,20 @@ func PyLongFromLongLong(n int64) *PyLong {
 	return NewPyLongWithPtr(cpy.PyLong_FromLongLong(n))
 }
 
+// Return value: New reference.
 func PyLong_FromDouble(n float64) *PyLong {
-	return NewPyLongWithPtr(cpy.PyLong_FromDouble(n))
+	u:=NewPyUnicode(fmt.Sprintf("%f",n))
+	defer u.Free()
+	return NewPyLongWithPtr(cpy.PyLong_FromUnicodeObject(u.Instance(),10))
+}
+// Return value: New reference.
+func PyLong_FromFloat32(n float32) *PyLong {
+	//浮点传不过去用字符代替
+	//u:=NewPyUnicode(fmt.Sprintf("%f",n))
+	//defer u.Free()
+	//fmt.Println(fmt.Sprintf("%f",n))
+	//return NewPyLongWithPtr(cpy.PyLong_FromUnicodeObject(u.Instance(),10))
+	return NewPyLongWithPtr(cpy.PyLong_FromVoidPtr(uintptr(unsafe.Pointer(&n))))
 }
 
 func AsPyLong(obj interface{}) *PyLong {

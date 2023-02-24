@@ -411,3 +411,12 @@ PyState_FindModule
 PyState_AddModule
 PyState_RemoveModule
 PyObject_Repr
+PyFloat_Type
+PyFloat_Check
+PyFloat_CheckExact
+PyFloat_FromString
+PyFloat_FromDouble
+PyFloat_AsDouble
+PyFloat_GetMax
+PyFloat_GetMin
+PyFloat_ClearFreeList

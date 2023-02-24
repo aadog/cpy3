@@ -17,6 +17,7 @@ func PyUnicode_GetLength(obj uintptr) int64 {
 	r := defSyscallN(dllimports.PyUnicode_GetLength, obj)
 	return int64(r)
 }
+//Return value: New reference.
 func PyUnicode_FromString(str string) uintptr {
 	if str == "" {
 		b := make([]byte, 1)

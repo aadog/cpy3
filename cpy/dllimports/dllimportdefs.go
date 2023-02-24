@@ -414,6 +414,16 @@ var dllImportDefs = []importTable{
     /*409*/ {"PyState_FindModule", 0},
     /*410*/ {"PyState_AddModule", 0},
     /*411*/ {"PyState_RemoveModule", 0},
+    /*412*/ {"PyObject_Repr", 0},
+    /*413*/ {"PyFloat_Type", 0},
+    /*414*/ {"PyFloat_Check", 0},
+    /*415*/ {"PyFloat_CheckExact", 0},
+    /*416*/ {"PyFloat_FromString", 0},
+    /*417*/ {"PyFloat_FromDouble", 0},
+    /*418*/ {"PyFloat_AsDouble", 0},
+    /*419*/ {"PyFloat_GetMax", 0},
+    /*420*/ {"PyFloat_GetMin", 0},
+    /*421*/ {"PyFloat_ClearFreeList", 0},
 }
 const (
     Py_NoneStruct = 0
@@ -828,4 +838,14 @@ const (
     PyState_FindModule = 409
     PyState_AddModule = 410
     PyState_RemoveModule = 411
+    PyObject_Repr = 412
+    PyFloat_Type = 413
+    PyFloat_Check = 414
+    PyFloat_CheckExact = 415
+    PyFloat_FromString = 416
+    PyFloat_FromDouble = 417
+    PyFloat_AsDouble = 418
+    PyFloat_GetMax = 419
+    PyFloat_GetMin = 420
+    PyFloat_ClearFreeList = 421
 )

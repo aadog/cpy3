@@ -48,6 +48,25 @@ func PyLong_FromDouble(n float64) uintptr {
 	return r
 }
 
+// Return value: New reference.
+func PyLong_FromFloat32(n float32) uintptr {
+	//浮点传不过去
+	r := defSyscallN(dllimports.PyLong_FromLongLong, uintptr(n))
+	return r
+}
+
+// Return value: New reference.
+func PyLong_FromUnicodeObject(obj uintptr,base int) uintptr {
+	r := defSyscallN(dllimports.PyLong_FromLongLong, uintptr(obj),uintptr(base))
+	return r
+}
+
+// Return value: New reference.
+func PyLong_FromVoidPtr(obj uintptr) uintptr {
+	r := defSyscallN(dllimports.PyLong_FromLongLong, uintptr(obj))
+	return r
+}
+
 //func PyLong_FromString(n float64) uintptr {
 //	r, _, _ := pyLong_FromLong.Call(uintptr(n))
 //	return r
