@@ -10,6 +10,30 @@ type PyObject struct {
 	instance unsafe.Pointer
 }
 
+// Return value: Borrowed reference.
+func (p *PyObject) GetAttrStringToString(attr_name string) string {
+	a:=AsPyObject(cpy.PyObject_GetAttrString(p._instance(),attr_name))
+	defer a.Free()
+	return AsPyUnicode(a).Str()
+}
+
+// Return value: Borrowed reference.
+func (p *PyObject) GetAttrStringToInt(attr_name string) int {
+	a:=AsPyObject(cpy.PyObject_GetAttrString(p._instance(),attr_name))
+	defer a.Free()
+	return AsPyLong(a).AsInt()
+}
+
+// Return value: New reference.
+func (p *PyObject) GetAttrString(attr_name string) *PyObject {
+	return AsPyObject(cpy.PyObject_GetAttrString(p._instance(),attr_name))
+}
+
+// Return value: New reference.
+func (p *PyObject) Dir() *PyDict {
+	return AsPyDict(cpy.PyObject_Dir(p._instance()))
+}
+
 func (p *PyObject) Str() string {
 	return p.ToString()
 }
@@ -88,7 +112,7 @@ func (p *PyObject) RefCount() int {
 	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
 }
 
-// Get class type information.
+// Return value: New reference
 func (p *PyObject) Type() *PyType {
 	return PyObjectType(p)
 }

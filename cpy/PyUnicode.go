@@ -3,6 +3,7 @@ package cpy
 import (
 	"github.com/aadog/cpy3/cpy/dllimports"
 	"unsafe"
+	"C"
 )
 
 func PyUnicode_Type() uintptr {

@@ -23,6 +23,7 @@ func (o *PyUnicode) Type() *PyType {
 	return PyObjectType(o)
 }
 
+// Return value: Borrowed reference.
 func (p *PyUnicode) Str() string {
 	return p.ToString()
 }
@@ -73,6 +74,7 @@ func (p *PyUnicode) InstanceSize() int32 {
 	panic("implement me")
 }
 
+// Return value: Borrowed reference.
 func (p *PyUnicode) ToString() string {
 	return cpy.PyObject_Str(p._instance())
 }

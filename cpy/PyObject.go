@@ -54,6 +54,7 @@ func PyObject_Hash(obj uintptr) int {
 	return int(r)
 }
 
+// Return value: Borrowed reference.
 func PyObject_Str(obj uintptr) string {
 	r := defSyscallN(dllimports.PyObject_Str, obj)
 	defer Py_DecRef(r)

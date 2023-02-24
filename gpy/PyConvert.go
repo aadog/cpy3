@@ -2,7 +2,15 @@ package gpy
 
 import (
 	"reflect"
+	"strings"
 )
+
+func convertCheckPyTypeName(toTypeString string,tp string)bool{
+	if strings.HasPrefix(toTypeString,"*")&&strings.HasSuffix(toTypeString,tp){
+		return true
+	}
+	return false
+}
 
 func GoToPyObject(o interface{}) IPyObject {
 	to := reflect.TypeOf(o)
@@ -63,6 +71,33 @@ func PyObjectToGo(o IPyObject, to reflect.Type) any {
 	if to.AssignableTo(reflect.TypeOf(o)) {
 		return o
 	}
+	toTypeString:=to.String()
+
+	if convertCheckPyTypeName(toTypeString,"PyObject"){
+		return AsPyObject(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyList"){
+		return AsPyList(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyDict"){
+		return AsPyDict(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyUnicode"){
+		return AsPyUnicode(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyLong"){
+		return AsPyLong(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyBool"){
+		return AsPyBool(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"PyBytes"){
+		return AsPyBytes(o)
+	}
+	if convertCheckPyTypeName(toTypeString,"IPyObject"){
+		return o
+	}
+
 	if to.Kind() == reflect.Int {
 		return int(AsPyLong(o).AsInt64())
 	}
@@ -122,12 +157,14 @@ func PyObjectToGo(o IPyObject, to reflect.Type) any {
 	if to.Kind() == reflect.Map {
 		l := reflect.MakeMap(to)
 		pyD := AsPyDict(o)
-		keys := AsPyList(pyD.Keys())
-		defer keys.DecRef()
-		for i := int64(0); i < keys.Size(); i++ {
-			k := keys.GetItem(i)
-			goK := PyObjectToGo(k, to.Key())
-			l.SetMapIndex(reflect.ValueOf(goK), reflect.ValueOf(PyObjectToGo(pyD.GetItem(k), to.Elem())))
+		if pyD.Size()>0{
+			keys := AsPyList(pyD.Keys())
+			defer keys.DecRef()
+			for i := int64(0); i < keys.Size(); i++ {
+				k := keys.GetItem(i)
+				goK := PyObjectToGo(k, to.Key())
+				l.SetMapIndex(reflect.ValueOf(goK), reflect.ValueOf(PyObjectToGo(pyD.GetItem(k), to.Elem())))
+			}
 		}
 		return l.Interface()
 	}
@@ -176,6 +213,33 @@ func PyObjectToGo(o IPyObject, to reflect.Type) any {
 		})
 		return f.Interface()
 	}
+
+	if to.Kind()==reflect.Interface{
+		tp:=o.Type()
+		defer tp.Free()
+		if tp.ClassName()=="NoneType"{
+			return nil
+		}
+		if tp.ClassName()=="str"{
+			return PyObjectToGo(o,reflect.TypeOf(""))
+		}
+		if tp.ClassName()=="int"{
+			return PyObjectToGo(o,reflect.TypeOf(int(1)))
+		}
+		if tp.ClassName()=="bool"{
+			return PyObjectToGo(o,reflect.TypeOf(false))
+		}
+		if tp.ClassName()=="list"{
+			return PyObjectToGo(o,reflect.TypeOf([]any{}))
+		}
+		if tp.ClassName()=="dict"{
+			return PyObjectToGo(o,reflect.TypeOf(map[string]any{}))
+		}
+		if tp.ClassName()=="float"{
+			return PyObjectToGo(o,reflect.TypeOf(float32(0)))
+		}
+	}
+
 
 	return o
 }

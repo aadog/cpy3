@@ -24,6 +24,11 @@ func PyErr_SetString(tp *PyObject, message string) {
 	cpy.PyErr_SetString(tp._instance(), message)
 }
 
+//Return value: Borrowed reference.
+func PyErr_Occurred() *PyObject{
+	return AsPyObject(cpy.PyErr_Occurred())
+}
+
 func FatalError(message string) {
 	cpy.Py_FatalError(message)
 }

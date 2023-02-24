@@ -33,7 +33,12 @@ func doPyGoModuleMethodForwardCallBack(self unsafe.Pointer,args unsafe.Pointer)u
 	newArgs := AsPyTuple(pyArgs.GetSlice(1, pyArgsLen))
 	defer newArgs.Free()
 
-	return PyMethodForward(pyModule, newArgs, ifn).UnsafeAddr()
+
+	r:=PyMethodForward(pyModule, newArgs, ifn)
+	if PyErr_Occurred()!=nil{
+		return nil
+	}
+	return r.UnsafeAddr()
 }
 
 const (
@@ -174,7 +179,6 @@ func AsPyGoModule(obj interface{}) *PyGoModule {
 }
 
 func PyMethodForward(self *PyGoModule, args *PyTuple, method interface{}) IPyObject {
-
 	methodType := reflect.TypeOf(method)
 	methodValue := reflect.ValueOf(method)
 	if methodType.Kind() != reflect.Func {
@@ -182,7 +186,7 @@ func PyMethodForward(self *PyGoModule, args *PyTuple, method interface{}) IPyObj
 	}
 	if int64(methodType.NumIn()) != args.Size() {
 		PyErr_SetString(UserException(), fmt.Sprintf("The number of parameters does not match,%d parameter is required, and you have entered %d", methodType.NumIn(), args.Size()))
-		return AsPyObject(PyReturnNone())
+		return nil
 	}
 
 	fnArgs := make([]reflect.Value, 0)

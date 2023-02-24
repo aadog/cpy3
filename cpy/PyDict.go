@@ -29,10 +29,13 @@ func PyDict_Size(obj uintptr) int64 {
 func PyDict_Clear(obj uintptr) {
 	defSyscallN(dllimports.PyDict_Clear, obj)
 }
+
+// Return value: Borrowed reference.
 func PyDict_GetItem(obj uintptr, key uintptr) uintptr {
 	r := defSyscallN(dllimports.PyDict_GetItem, obj, key)
 	return r
 }
+// Return value: New reference.
 func PyDict_Keys(obj uintptr) uintptr {
 	r := defSyscallN(dllimports.PyDict_Keys, obj)
 	return r

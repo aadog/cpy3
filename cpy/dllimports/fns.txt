@@ -410,3 +410,4 @@ PyMethod_Self
 PyState_FindModule
 PyState_AddModule
 PyState_RemoveModule
+PyObject_Repr

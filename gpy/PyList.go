@@ -80,6 +80,7 @@ func (p *PyList) ToString() string {
 func (p *PyList) SetItem(index int64, o *PyObject) int {
 	return cpy.PyList_SetItem(p._instance(), index, o._instance())
 }
+// Return value: Borrowed reference.
 func (p *PyList) GetItem(index int64) *PyObject {
 	return AsPyObject(cpy.PyList_GetItem(p._instance(), index))
 }

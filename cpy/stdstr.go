@@ -10,6 +10,7 @@ package cpy
 
 import (
 	"unsafe"
+	"reflect"
 )
 
 // StringToUTF8Ptr
@@ -81,13 +82,7 @@ func GoStr(str uintptr) string {
 	if str == 0 {
 		return ""
 	}
-	s := PyUnicode_DecodeFSDefault(str)
-	defer Py_DecRef(s)
-	l := PyUnicode_GetLength(s)
-	if l == 0 {
-		return ""
-	}
-	return copyStr(str, int(l))
+	return CStringToString(str)
 }
 
 func GoStr1(str uintptr, len int) string {
@@ -95,4 +90,33 @@ func GoStr1(str uintptr, len int) string {
 		return ""
 	}
 	return copyStr(str, int(len))
+}
+
+func CStringToString(s uintptr) string {
+	if s == 0 {
+		return ""
+	}
+
+	end := -1
+	for i := 0; ; i++ {
+		if *(*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(s)) + uintptr(i))) == 0 {
+			end = i
+			break
+		}
+	}
+
+	if end == -1 {
+		return ""
+	}
+
+	return string(toByteSlice(s, int32(end)))
+}
+
+func toByteSlice(a uintptr, length int32) []byte {
+	header := reflect.SliceHeader{
+		uintptr(unsafe.Pointer(a)),
+		int(length),
+		int(length),
+	}
+	return (*(*[]byte)(unsafe.Pointer(&header)))[:]
 }

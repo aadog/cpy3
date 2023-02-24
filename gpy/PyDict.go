@@ -19,6 +19,7 @@ func (p *PyClass) RefCount() int {
 	return int(cpy.PyObjectFromPtr(p._instance()).Ob_refcnt)
 }
 
+// Return value: New reference
 func (p *PyDict) Type() *PyType {
 	return PyObjectType(p)
 }
@@ -88,10 +89,12 @@ func (p *PyDict) DelItem(key *PyObject) int {
 func (p *PyDict) GetItemString(key string) *PyObject {
 	return AsPyObject(cpy.PyDict_GetItemString(p._instance(), key))
 }
-
+// Return value: New reference.
 func (p *PyDict) Keys() *PyObject {
 	return NewPyObjectWithPtr(cpy.PyDict_Keys(p._instance()))
 }
+
+// Return value: Borrowed reference.
 func (p *PyDict) GetItem(key *PyObject) *PyObject {
 	return AsPyObject(cpy.PyDict_GetItem(p._instance(), key._instance()))
 }

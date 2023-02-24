@@ -17,3 +17,9 @@ func PyExc_ValueError() uintptr {
 func PyErr_SetString(tp uintptr, message string) {
 	defSyscallN(dllimports.PyErr_SetString, tp, PascalStr(message))
 }
+
+//Return value: Borrowed reference.
+func PyErr_Occurred()uintptr{
+	return defSyscallN(dllimports.PyErr_Occurred)
+}
+

@@ -6,6 +6,7 @@ func PyList_Type() uintptr {
 	return uintptr(dllimports.GetImportDefFunc(uiLib, dllimports.PyList_Type))
 }
 
+// Return value: New reference.
 func PyList_New(len int64) uintptr {
 	r := defSyscallN(dllimports.PyList_New, uintptr(len))
 	return r
@@ -15,6 +16,8 @@ func PyList_SetItem(obj uintptr, index int64, item uintptr) int {
 	r := defSyscallN(dllimports.PyList_SetItem, obj, uintptr(index), item)
 	return int(r)
 }
+
+// Return value: Borrowed reference.
 func PyList_GetItem(obj uintptr, index int64) uintptr {
 	r := defSyscallN(dllimports.PyList_GetItem, obj, uintptr(index))
 	return r

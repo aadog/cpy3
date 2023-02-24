@@ -47,6 +47,7 @@ func (p *PyType) UnsafeAddr() unsafe.Pointer {
 	return p.instance
 }
 
+// Return value: Borrowed reference.
 func (p *PyType) ClassName() string {
 	obj := cpy.PyObject_GetAttrString(p._instance(), "__name__")
 	defer cpy.Py_DecRef(obj)
@@ -79,6 +80,13 @@ func NewPyTypeWithPtr(ptr uintptr) *PyType {
 // Return value: New reference
 func PyObjectType(owner IPyObject) *PyType {
 	return NewPyTypeWithPtr(cpy.PyObject_Type(CheckPtr(owner)))
+}
+
+// Return value: Borrowed reference.
+func PyObjectTypeName(owner IPyObject)string{
+	tp:=PyObjectType(owner)
+	defer tp.Free()
+	return tp.ClassName()
 }
 
 func AsType(obj interface{}) *PyType {
